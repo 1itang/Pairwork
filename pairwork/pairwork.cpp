@@ -11,10 +11,6 @@ static Shape* shapeList[500000];
 
 class Solve {
 public:
-	int num;
-	int cnt;
-	set<pair<double, double>> interSet;
-
 	Solve(int num);
 	int getSolve();
 	void addShape(Shape* s);
@@ -25,6 +21,11 @@ public:
 
 	bool checkXRange(Line* l, pair<double, double> intersect);  //检查算出交点的x在不在线段/射线横坐标范围内
 	bool checkYRange(Line* l, pair<double, double> intersect);  //检查算出交点的y在不在线段/射线纵坐标范围内
+	
+private:
+	int num;
+	int cnt;
+	set<pair<double, double>> interSet;
 };
 
 Solve::Solve(int num) {
@@ -47,8 +48,8 @@ void Solve::addShape(Shape* s) {
 
 void Solve::getIntersect(Shape* s1, Shape* s2, set<pair<double, double>>* interSet) {   //计算两图形的交点
 	char t1, t2;
-	t1 = s1->type;
-	t2 = s2->type;
+	t1 = s1->getType();
+	t2 = s2->getType();
 	if (t1 == 'L' && t2 == 'L') {   //求两线的交点
 		LLintersect((Line*)s1, (Line*)s2, interSet);
 	}
@@ -56,10 +57,10 @@ void Solve::getIntersect(Shape* s1, Shape* s2, set<pair<double, double>>* interS
 		CCintersect((Circle*)s1, (Circle*)s2, interSet);
 	}
 	else {  //求线与圆的交点
-		if (s1->type == 'L' && s2->type == 'C') {
+		if (s1->getType() == 'L' && s2->getType() == 'C') {
 			CLintersect((Circle*)s2, (Line*)s1, interSet);
 		}
-		else if (s1->type == 'C' && s2->type == 'L') {
+		else if (s1->getType() == 'C' && s2->getType() == 'L') {
 			CLintersect((Circle*)s1, (Line*)s2, interSet);
 		}
 		else {
@@ -69,12 +70,12 @@ void Solve::getIntersect(Shape* s1, Shape* s2, set<pair<double, double>>* interS
 }
 
 void Solve::LLintersect(Line* l1, Line* l2, set<pair<double, double>>* interSet) {
-	double a1 = (double)l1->y1 - l1->y2;
-	double b1 = (double)l1->x2 - l1->x1;
-	double c1 = (double)l1->x1 * l1->y2 - (double)l1->x2 * l1->y1;  //l1: a1x + b1y + c1 = 0
-	double a2 = (double)l2->y1 - l2->y2;
-	double b2 = (double)l2->x2 - l2->x1;
-	double c2 = (double)l2->x1 * l2->y2 - (double)l2->x2 * l2->y1;  //l2: a2x + b2y + c2 = 0
+	double a1 = (double)l1->getY1() - l1->getY2();
+	double b1 = (double)l1->getX2() - l1->getX1();
+	double c1 = (double)l1->getX1() * l1->getY2() - (double)l1->getX2() * l1->getY1();  //l1: a1x + b1y + c1 = 0
+	double a2 = (double)l2->getY1() - l2->getY2();
+	double b2 = (double)l2->getX2() - l2->getX1();
+	double c2 = (double)l2->getX1() * l2->getY2() - (double)l2->getX2() * l2->getY1();  //l2: a2x + b2y + c2 = 0
 	double d = a1 * b2 - a2 * b1;
 	if (d == 0) {
 		if (d == 0) {   //d == 0时两直线平行
@@ -92,12 +93,12 @@ void Solve::LLintersect(Line* l1, Line* l2, set<pair<double, double>>* interSet)
 }
 
 void Solve::CCintersect(Circle* c1, Circle* c2, set<pair<double, double>>* interSet) {
-	double a1 = c1->x;
-	double b1 = c1->y;
-	double r1 = c1->r;
-	double a2 = c2->x;
-	double b2 = c2->y;
-	double r2 = c2->r;
+	double a1 = c1->getX();
+	double b1 = c1->getY();
+	double r1 = c1->getR();
+	double a2 = c2->getX();
+	double b2 = c2->getY();
+	double r2 = c2->getR();
 	if (((pow((a1 - a2), 2) + pow((b1 - b2), 2)) > pow(r1 + r2, 2)) ||
 		((pow((a1 - a2), 2) + pow((b1 - b2), 2)) < pow(r1 - r2, 2))) {///edited by li
 		return; //两圆不相交
@@ -120,12 +121,12 @@ void Solve::CCintersect(Circle* c1, Circle* c2, set<pair<double, double>>* inter
 }
 
 void Solve::CLintersect(Circle* circle1, Line* line2, set<pair<double, double>>* interSet) {
-	double a = circle1->x;
-	double b = circle1->y;
-	double r = circle1->r;
-	double a1 = (double)line2->y1 - line2->y2;
-	double b1 = (double)line2->x2 - line2->x1;
-	double c1 = (double)line2->x1 * line2->y2 - (double)line2->x2 * line2->y1;  //l2: a1x + b1y + c1 = 0
+	double a = circle1->getX();
+	double b = circle1->getY();
+	double r = circle1->getR();
+	double a1 = (double)line2->getY1() - line2->getY2();
+	double b1 = (double)line2->getX2() - line2->getX1();
+	double c1 = (double)line2->getX1() * line2->getY2() - (double)line2->getX2() * line2->getY1();  //l2: a1x + b1y + c1 = 0
 
 	double d = abs((a1 * a + b1 * b + c1) / sqrt(a1 * a1 + b1 * b1));
 	if (d > r) {    //圆与直线不相交
@@ -165,27 +166,27 @@ void Solve::CLintersect(Circle* circle1, Line* line2, set<pair<double, double>>*
 }
 
 bool Solve::checkXRange(Line* l, pair<double, double> intersect) {
-	if (l->x1 == l->x2) {    //垂直于x轴的直线，这种情况不能用x判断
+	if (l->getX1() == l->getX2()) {    //垂直于x轴的直线，这种情况不能用x判断
 		return checkYRange(l, intersect);
 	}
-	char subtype = l->subtype;
+	char subtype = l->getSubtype();
 	if (subtype == 'L') {   //l是直线，无需检查
 		return true;
 	}
 	else if (subtype == 'R') {  //l是射线
-		if (l->x1 < l->x2) {
-			if (intersect.first >= l->x1) {
+		if (l->getX1() < l->getX2()) {
+			if (intersect.first >= l->getX1()) {
 				return true;
 			}
 		}
 		else {
-			if (intersect.first <= l->x1) {
+			if (intersect.first <= l->getX1()) {
 				return true;
 			}
 		}
 	}
 	else {  //l是线段
-		if (intersect.first <= l->xmax && intersect.first >= l->xmin) {
+		if (intersect.first <= l->getXmax() && intersect.first >= l->getXmin()) {
 			return true;
 		}
 	}
@@ -193,24 +194,24 @@ bool Solve::checkXRange(Line* l, pair<double, double> intersect) {
 }
 
 bool Solve::checkYRange(Line* l, pair<double, double> intersect) {
-	char subtype = l->subtype;
+	char subtype = l->getSubtype();
 	if (subtype == 'L') {   //l是直线，无需检查
 		return true;
 	}
 	else if (subtype == 'R') {  //l是射线
-		if (l->y1 < l->y2) {
-			if (intersect.second >= l->y1) {
+		if (l->getY1() < l->getY2()) {
+			if (intersect.second >= l->getY1()) {
 				return true;
 			}
 		}
 		else {
-			if (intersect.second <= l->y1) {
+			if (intersect.second <= l->getY1()) {
 				return true;
 			}
 		}
 	}
 	else {  //l是线段
-		if (intersect.second <= l->ymax && intersect.second >= l->ymin) {
+		if (intersect.second <= l->getYmax() && intersect.second >= l->getYmin()) {
 			return true;
 		}
 	}
